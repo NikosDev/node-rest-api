@@ -27,7 +27,7 @@ router.post('/login', function(req, res) {
     var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
     if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
     var token = jwt.sign({ id: user._id }, config.secret, {
-      expiresIn: 900 // expires in 24 hours
+      expiresIn: 360 // expires in 24 hours
     });    
 
     res.status(200).send({ auth: true, token: token, refreshToken: user.refreshToken});
@@ -56,7 +56,7 @@ router.post('/register', function(req, res) {
     // if user is registered without errors
     // create a token
     var token = jwt.sign({ id: user._id }, config.secret, {
-      expiresIn: 900 // expires in 24 hours
+      expiresIn: 360 // expires in 24 hours
     });
 
     
@@ -87,9 +87,9 @@ router.post('/refresh', function(req, res, next) {
     if (user){ 
       //Sign jwt token  
       var newtoken = jwt.sign({ id: user._id }, config.secret, {
-          expiresIn: 600
+          expiresIn: 1200 //20 Minutes
       });
-
+        console.log(newtoken)
       //Update User on database
       var myquery = { _id: user.id };
       var newvalues = {$set: {refreshToken: newtoken} };
