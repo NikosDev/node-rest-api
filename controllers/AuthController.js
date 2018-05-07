@@ -84,10 +84,20 @@ router.post('/refresh', function(req, res, next) {
   User.findOne({refreshToken: req.body.token}, { password: 0 }, function(err, user) {
     if (err) return next(err);
     
-    if (user){
+    if (user){ 
+      //Sign jwt token  
       var newtoken = jwt.sign({ id: user._id }, config.secret, {
           expiresIn: 600
       });
+
+      //Update User on database
+      var myquery = { _id: user.id };
+      var newvalues = {$set: {refreshToken: newtoken} };
+      User.updateOne(myquery, newvalues, function(err, res) {
+        if (err) throw err;
+      })
+
+
       res.status(200).send({token: newtoken});
     }else{
       return res.status(404).send("Token not found!");
